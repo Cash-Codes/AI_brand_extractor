@@ -195,12 +195,12 @@ class UrlExtractionIntegrationTest {
         ArgumentCaptor<AiExtractionRequest> captor = ArgumentCaptor.forClass(AiExtractionRequest.class);
         verify(aiClient).extract(captor.capture());
 
-        // acme-studio.html has #1A2B3C and #FF6600 in its <style> block
+        // acme-studio.html has #1E3A8A (navy, --primary) and #FF6600 (orange, .cta) in its <style>
         List<String> hexValues = captor.getValue().colorCandidates()
                 .stream()
                 .map(ColorCandidate::hex)
                 .toList();
-        assertThat(hexValues).contains("#1A2B3C", "#FF6600");
+        assertThat(hexValues).contains("#1E3A8A", "#FF6600");
     }
 
     @Test
