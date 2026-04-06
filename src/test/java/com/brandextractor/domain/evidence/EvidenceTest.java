@@ -39,9 +39,14 @@ class EvidenceTest {
 
     @Test
     void ocrEvidence_holdsTextBlocks() {
-        var evidence = new OcrEvidence("ocr-1", "IMAGE", "flyer.png", List.of("ACME", "Studio"), 0.91, NOW);
+        var blocks = List.of(
+                new TextBlock("ACME",   new BoundingBox(0.1, 0.1, 0.4, 0.2), 0.97),
+                new TextBlock("Studio", new BoundingBox(0.1, 0.3, 0.3, 0.2), 0.93));
+        var evidence = new OcrEvidence("ocr-1", "IMAGE", "flyer.png", blocks, 0.91, NOW);
 
-        assertThat(evidence.textBlocks()).containsExactly("ACME", "Studio");
+        assertThat(evidence.blocks()).hasSize(2);
+        assertThat(evidence.blocks().get(0).text()).isEqualTo("ACME");
+        assertThat(evidence.blocks().get(1).boundingBox().y()).isEqualTo(0.3);
         assertThat(evidence.confidence()).isEqualTo(0.91);
     }
 

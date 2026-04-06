@@ -43,6 +43,13 @@ public interface ExtractionResultMapper {
     ContactLinksDto toContactLinksDto(ContactLinks links);
     ConfidenceDto   toConfidenceDto(ConfidenceScore score);
 
+    default TextBlockDto toTextBlockDto(com.brandextractor.domain.evidence.TextBlock block) {
+        BoundingBoxDto bbox = block.boundingBox() == null ? null
+                : new BoundingBoxDto(block.boundingBox().x(), block.boundingBox().y(),
+                                     block.boundingBox().width(), block.boundingBox().height());
+        return new TextBlockDto(block.text(), bbox, block.confidence());
+    }
+
     default List<EvidenceDto> toEvidenceDtoList(List<Evidence> list) {
         return list.stream().map(this::toEvidenceDto).toList();
     }
@@ -55,9 +62,10 @@ public interface ExtractionResultMapper {
                                              e.cssColorCandidates(), e.ogTitle(), e.ogDescription(),
                                              e.ogImage(), e.ogSiteName(), e.twitterCard(), e.twitterImage());
             case FlyerEvidence e      -> new FlyerEvidenceDto(e.id(), e.sourceType(), e.sourceReference(),
-                                             e.mimeType(), e.width(), e.height(), e.sizeBytes());
+                                             e.mimeType(), e.width(), e.height(), e.sizeBytes(),
+                                             e.dominantColors());
             case OcrEvidence e        -> new OcrEvidenceDto(e.id(), e.sourceType(), e.sourceReference(),
-                                             e.textBlocks());
+                                             e.blocks().stream().map(this::toTextBlockDto).toList());
             case VisualEvidence e     -> new VisualEvidenceDto(e.id(), e.sourceType(), e.sourceReference(),
                                              e.detectedLabels(), e.dominantTheme());
             case ColorEvidence e      -> new ColorEvidenceDto(e.id(), e.sourceType(), e.sourceReference(),
