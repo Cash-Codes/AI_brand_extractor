@@ -31,7 +31,8 @@ class DomainModelTest {
                 UUID.randomUUID(), ExtractionInputType.URL,
                 "https://example.com", "https://example.com/",
                 brandProfile, colors, assets, links, confidence,
-                List.of(warning), List.of(issue), 8, 12, 0, true);
+                List.of(warning), List.of(issue), 8, 12, 0, true,
+                List.of());
 
         assertThat(result.inputType()).isEqualTo(ExtractionInputType.URL);
         assertThat(result.brandProfile().brandName().value()).isEqualTo("Acme");
@@ -42,5 +43,6 @@ class DomainModelTest {
         assertThat(result.validationIssues().get(0).severity()).isEqualTo(ValidationIssue.Severity.WARNING);
         assertThat(result.links().twitter()).isEqualTo("@acme");
         assertThat(result.links().facebook()).isNull();
+        assertThat(result.evidence()).isEmpty();
     }
 }
