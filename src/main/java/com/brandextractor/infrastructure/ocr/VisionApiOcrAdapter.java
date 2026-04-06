@@ -2,6 +2,7 @@ package com.brandextractor.infrastructure.ocr;
 
 import com.brandextractor.domain.evidence.OcrEvidence;
 import com.brandextractor.domain.ports.OcrPort;
+import com.brandextractor.support.error.FeatureNotAvailableException;
 import org.springframework.stereotype.Component;
 
 @Component
