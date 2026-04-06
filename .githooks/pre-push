@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+
+export JAVA_HOME=/usr/local/opt/openjdk@21
+
+echo "pre-push: running full test suite..."
+
+if ./gradlew test -q 2>&1; then
+  echo "pre-push: all tests passed"
+else
+  echo "pre-push: tests FAILED — fix failures before pushing"
+  exit 1
+fi
