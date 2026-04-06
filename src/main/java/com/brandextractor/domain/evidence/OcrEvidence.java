@@ -7,6 +7,6 @@ public record OcrEvidence(
         String id,
         String sourceType,
         String sourceReference,
-        List<String> textBlocks,
+        List<TextBlock> blocks,   // text regions with bounding-box metadata
         double confidence,
         Instant extractedAt) implements Evidence {}

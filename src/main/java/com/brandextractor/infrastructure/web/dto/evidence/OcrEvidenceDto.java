@@ -6,4 +6,4 @@ public record OcrEvidenceDto(
         String id,
         String sourceType,
         String sourceReference,
-        List<String> textBlocks) implements EvidenceDto {}
+        List<TextBlockDto> blocks) implements EvidenceDto {}

@@ -1,5 +1,7 @@
 package com.brandextractor.infrastructure.web.dto.evidence;
 
+import java.util.List;
+
 public record FlyerEvidenceDto(
         String id,
         String sourceType,
@@ -7,4 +9,5 @@ public record FlyerEvidenceDto(
         String mimeType,
         int width,
         int height,
-        long sizeBytes) implements EvidenceDto {}
+        long sizeBytes,
+        List<String> dominantColors) implements EvidenceDto {}
