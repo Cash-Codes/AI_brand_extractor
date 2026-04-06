@@ -25,4 +25,21 @@ public class ExtractionLogger {
         log.error("Extraction failed requestId={}", requestId, ex);
         MDC.clear();
     }
+
+    /**
+     * Clears all MDC entries set by {@link #logStart}.
+     * <p>Call this in a {@code finally} block in the orchestration layer to guarantee
+     * cleanup even when an exception bypasses {@link #logComplete} or {@link #logError}:
+     * <pre>{@code
+     * logger.logStart(requestId, inputType, source);
+     * try {
+     *     // ... extraction ...
+     * } finally {
+     *     logger.clearContext();
+     * }
+     * }</pre>
+     */
+    public void clearContext() {
+        MDC.clear();
+    }
 }

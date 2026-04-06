@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-export JAVA_HOME=/usr/local/opt/openjdk@21
+export JAVA_HOME="${JAVA_HOME:-/usr/local/opt/openjdk@21}"
 
 echo "pre-commit: checking project compiles..."
 
