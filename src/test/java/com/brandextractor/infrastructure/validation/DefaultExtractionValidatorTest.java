@@ -110,6 +110,119 @@ class DefaultExtractionValidatorTest {
     }
 
     // -------------------------------------------------------------------------
+    // INVALID_COLOR_FORMAT
+    // -------------------------------------------------------------------------
+
+    @Test
+    void warningWhenPrimaryColorHasInvalidHexFormat() {
+        var colors = new ColorSelection(new ColorValue("red", 1.0, List.of()), null, null);
+        var result = resultWith(brandProfile("Acme", null, null), colors, 0.80);
+
+        var issues = validator.validate(result);
+
+        assertThat(issues).anyMatch(i ->
+                i.code().equals("INVALID_COLOR_FORMAT") &&
+                i.severity() == ValidationIssue.Severity.WARNING &&
+                i.message().contains("red"));
+    }
+
+    @Test
+    void warningWhenSecondaryColorHasInvalidHexFormat() {
+        var colors = new ColorSelection(
+                new ColorValue("#FF0000", 1.0, List.of()),
+                new ColorValue("notahex", 1.0, List.of()),
+                null);
+        var result = resultWith(brandProfile("Acme", null, null), colors, 0.80);
+
+        assertThat(validator.validate(result))
+                .anyMatch(i -> i.code().equals("INVALID_COLOR_FORMAT") &&
+                               i.message().contains("notahex"));
+    }
+
+    @Test
+    void noColorFormatWarningForValidHex() {
+        var result = resultWith(brandProfile("Acme", null, null), colorSelection("#1A2B3C"), 0.80);
+
+        assertThat(validator.validate(result))
+                .noneMatch(i -> i.code().equals("INVALID_COLOR_FORMAT"));
+    }
+
+    @Test
+    void noColorFormatWarningForNullColor() {
+        var result = resultWith(brandProfile("Acme", null, null),
+                new ColorSelection(null, null, null), 0.80);
+
+        assertThat(validator.validate(result))
+                .noneMatch(i -> i.code().equals("INVALID_COLOR_FORMAT"));
+    }
+
+    // -------------------------------------------------------------------------
+    // DUPLICATE_COLOR_ROLES
+    // -------------------------------------------------------------------------
+
+    @Test
+    void warningWhenPrimaryAndSecondaryColorAreIdentical() {
+        var colors = new ColorSelection(
+                new ColorValue("#FF0000", 1.0, List.of()),
+                new ColorValue("#FF0000", 1.0, List.of()),
+                null);
+        var result = resultWith(brandProfile("Acme", null, null), colors, 0.80);
+
+        assertThat(validator.validate(result))
+                .anyMatch(i -> i.code().equals("DUPLICATE_COLOR_ROLES") &&
+                               i.severity() == ValidationIssue.Severity.WARNING);
+    }
+
+    @Test
+    void warningWhenPrimaryAndTextColorAreIdentical() {
+        var colors = new ColorSelection(
+                new ColorValue("#FF0000", 1.0, List.of()),
+                null,
+                new ColorValue("#FF0000", 1.0, List.of()));
+        var result = resultWith(brandProfile("Acme", null, null), colors, 0.80);
+
+        assertThat(validator.validate(result))
+                .anyMatch(i -> i.code().equals("DUPLICATE_COLOR_ROLES"));
+    }
+
+    @Test
+    void noDuplicateWarningWhenAllColorsDistinct() {
+        var colors = new ColorSelection(
+                new ColorValue("#FF0000", 1.0, List.of()),
+                new ColorValue("#00FF00", 1.0, List.of()),
+                new ColorValue("#0000FF", 1.0, List.of()));
+        var result = resultWith(brandProfile("Acme", null, null), colors, 0.80);
+
+        assertThat(validator.validate(result))
+                .noneMatch(i -> i.code().equals("DUPLICATE_COLOR_ROLES"));
+    }
+
+    @Test
+    void noDuplicateWarningWhenSecondaryAndTextSameButPrimaryDifferent() {
+        // rule only checks primary vs secondary and primary vs text
+        var colors = new ColorSelection(
+                new ColorValue("#FF0000", 1.0, List.of()),
+                new ColorValue("#0000FF", 1.0, List.of()),
+                new ColorValue("#0000FF", 1.0, List.of()));
+        var result = resultWith(brandProfile("Acme", null, null), colors, 0.80);
+
+        assertThat(validator.validate(result))
+                .noneMatch(i -> i.code().equals("DUPLICATE_COLOR_ROLES"));
+    }
+
+    @Test
+    void duplicateCheckIsCaseInsensitive() {
+        var colors = new ColorSelection(
+                new ColorValue("#ff0000", 1.0, List.of()),
+                new ColorValue("#FF0000", 1.0, List.of()),
+                null);
+        var result = resultWith(brandProfile("Acme", null, null), colors, 0.80);
+
+        assertThat(validator.validate(result))
+                .anyMatch(i -> i.code().equals("DUPLICATE_COLOR_ROLES"));
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 

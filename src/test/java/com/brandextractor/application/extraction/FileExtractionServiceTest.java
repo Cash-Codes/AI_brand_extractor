@@ -21,12 +21,13 @@ import static org.mockito.Mockito.*;
 
 class FileExtractionServiceTest {
 
-    private FlyerIngestionPort       flyerIngestionPort;
-    private OcrPort                  ocrPort;
-    private VisualAnalysisPort       visualAnalysisPort;
-    private AIAnalysisPort           aiAnalysisPort;
-    private ExtractionValidationPort validationPort;
-    private FileExtractionService    service;
+    private FlyerIngestionPort          flyerIngestionPort;
+    private OcrPort                     ocrPort;
+    private VisualAnalysisPort          visualAnalysisPort;
+    private AIAnalysisPort              aiAnalysisPort;
+    private ExtractionNormalizationPort normalizationPort;
+    private ExtractionValidationPort    validationPort;
+    private FileExtractionService       service;
 
     @BeforeEach
     void setUp() {
@@ -34,10 +35,13 @@ class FileExtractionServiceTest {
         ocrPort            = mock(OcrPort.class);
         visualAnalysisPort = mock(VisualAnalysisPort.class);
         aiAnalysisPort     = mock(AIAnalysisPort.class);
+        normalizationPort  = mock(ExtractionNormalizationPort.class);
         validationPort     = mock(ExtractionValidationPort.class);
         service = new FileExtractionService(
-                flyerIngestionPort, ocrPort, visualAnalysisPort, aiAnalysisPort, validationPort);
+                flyerIngestionPort, ocrPort, visualAnalysisPort,
+                aiAnalysisPort, normalizationPort, validationPort);
 
+        when(normalizationPort.normalize(any())).thenAnswer(inv -> inv.getArgument(0));
         when(validationPort.validate(any())).thenReturn(List.of());
     }
 
