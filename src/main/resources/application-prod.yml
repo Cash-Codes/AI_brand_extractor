@@ -1,0 +1,29 @@
+# Production profile.
+# Set SPRING_PROFILES_ACTIVE=prod in the deployment environment.
+# All sensitive values must be supplied as environment variables — no defaults here.
+
+vertexai:
+  enabled: true
+
+logging:
+  level:
+    root: WARN
+    com.brandextractor: INFO
+    com.google.cloud: WARN
+  # Structured JSON logging for log aggregation pipelines (Stackdriver, Datadog, etc.)
+  pattern:
+    console: '{"timestamp":"%d{yyyy-MM-dd'\''T'\''HH:mm:ss.SSSZ}","level":"%level","logger":"%logger{36}","thread":"%thread","message":"%replace(%msg){'\''"'\'','\''\\"'\''}","trace":"%X{traceId}","span":"%X{spanId}"}'
+
+server:
+  # Return only the minimum required headers in error responses
+  error:
+    include-stacktrace: never
+    include-message: never
+
+management:
+  endpoint:
+    health:
+      show-details: when-authorized
+  # Restrict actuator to internal network only (back-channel port)
+  server:
+    port: ${MANAGEMENT_PORT:8081}

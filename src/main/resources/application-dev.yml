@@ -1,0 +1,19 @@
+# Cloud dev / staging profile.
+# Vertex AI is enabled — requires VERTEXAI_PROJECT_ID and GCP credentials.
+# Set SPRING_PROFILES_ACTIVE=dev in the deployment environment.
+
+vertexai:
+  enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.brandextractor: DEBUG
+    com.google.cloud: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} %-5level [%thread] %logger{36} - %msg%n"
+
+management:
+  endpoint:
+    health:
+      show-details: always

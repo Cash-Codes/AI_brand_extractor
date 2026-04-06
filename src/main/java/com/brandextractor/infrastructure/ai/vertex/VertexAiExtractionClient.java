@@ -13,6 +13,7 @@ import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +35,7 @@ import java.io.IOException;
  * </ol>
  */
 @Component
+@ConditionalOnProperty(name = "vertexai.enabled", havingValue = "true")
 public class VertexAiExtractionClient implements BrandExtractionAiClient {
 
     private static final Logger log = LoggerFactory.getLogger(VertexAiExtractionClient.class);

@@ -1,23 +1,38 @@
 spring:
   application:
     name: brand-extractor-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
   servlet:
     multipart:
       enabled: true
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: ${MAX_UPLOAD_SIZE:10MB}
+      max-request-size: ${MAX_REQUEST_SIZE:12MB}
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+  tomcat:
+    connection-timeout: ${SERVER_CONNECTION_TIMEOUT:5s}
+    threads:
+      max: ${SERVER_MAX_THREADS:50}
+
+spring.lifecycle:
+  timeout-per-shutdown-phase: ${SHUTDOWN_TIMEOUT:15s}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: when-authorized
+      probes:
+        enabled: true   # exposes /actuator/health/liveness and /actuator/health/readiness
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 springdoc:
   swagger-ui:
@@ -25,7 +40,16 @@ springdoc:
   api-docs:
     path: /v3/api-docs
 
+# ---------------------------------------------------------------------------
+# Vertex AI / Gemini
+# Set VERTEXAI_ENABLED=true once VERTEXAI_PROJECT_ID and GCP credentials are
+# configured. When false (the default), MockBrandExtractionAiClient is used.
+# ---------------------------------------------------------------------------
 vertexai:
+  enabled: ${VERTEXAI_ENABLED:false}
   project-id: ${VERTEXAI_PROJECT_ID:}
-  location: us-central1
-  model-id: gemini-2.0-flash-001
+  location: ${VERTEXAI_LOCATION:us-central1}
+  model-id: ${VERTEXAI_MODEL_ID:gemini-2.0-flash-001}
+  temperature: ${VERTEXAI_TEMPERATURE:0.0}
+  max-output-tokens: ${VERTEXAI_MAX_OUTPUT_TOKENS:2048}
+  max-parse-retries: ${VERTEXAI_MAX_PARSE_RETRIES:2}
