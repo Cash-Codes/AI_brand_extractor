@@ -26,6 +26,7 @@ public interface ExtractionResultMapper {
     @Mapping(target = "summary",             expression = "java(profile.summary().value())")
     @Mapping(target = "summaryConfidence",   expression = "java(profile.summary().confidence())")
     BrandProfileDto toBrandProfileDto(BrandProfile profile);
+
     ColorSelectionDto toColorSelectionDto(ColorSelection colors);
     ColorValueDto     toColorValueDto(ColorValue colorValue);
     AssetSelectionDto toAssetSelectionDto(AssetSelection assets);
