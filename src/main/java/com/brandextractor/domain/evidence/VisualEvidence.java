@@ -1,5 +1,6 @@
 package com.brandextractor.domain.evidence;
 
+import java.time.Instant;
 import java.util.List;
 
 public record VisualEvidence(
@@ -7,4 +8,6 @@ public record VisualEvidence(
         String sourceType,
         String sourceReference,
         List<String> detectedLabels,
-        String dominantTheme) implements Evidence {}
+        String dominantTheme,
+        double confidence,
+        Instant extractedAt) implements Evidence {}

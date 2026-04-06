@@ -1,5 +1,6 @@
 package com.brandextractor.domain.evidence;
 
+import java.time.Instant;
 import java.util.List;
 
 public record WebsiteEvidence(
@@ -10,4 +11,6 @@ public record WebsiteEvidence(
         String metaDescription,
         String resolvedUrl,
         List<String> headings,
-        String htmlSnippet) implements Evidence {}
+        String htmlSnippet,
+        double confidence,
+        Instant extractedAt) implements Evidence {}

@@ -1,5 +1,7 @@
 package com.brandextractor.domain.evidence;
 
+import java.time.Instant;
+
 public record FlyerEvidence(
         String id,
         String sourceType,
@@ -7,4 +9,6 @@ public record FlyerEvidence(
         String mimeType,
         int width,
         int height,
-        long sizeBytes) implements Evidence {}
+        long sizeBytes,
+        double confidence,
+        Instant extractedAt) implements Evidence {}
