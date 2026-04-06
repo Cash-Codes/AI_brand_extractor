@@ -1,5 +1,6 @@
 package com.brandextractor.domain.evidence;
 
+// Note: imageBytes is intentionally excluded from ScreenshotEvidenceDto (API serialisation).
 public record ScreenshotEvidence(
         String id,
         String sourceType,
