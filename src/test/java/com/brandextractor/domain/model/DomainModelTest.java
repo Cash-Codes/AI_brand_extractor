@@ -21,7 +21,8 @@ class DomainModelTest {
         var assetItem    = new AssetItem("https://example.com/logo.svg", AssetRole.PRIMARY_LOGO,
                                          0.94, 280, 96, "image/svg+xml", List.of("img-3"));
         var assets       = new AssetSelection(List.of(assetItem), List.of());
-        var links        = new ContactLinks("https://example.com", null, null, null);
+        var links        = new ContactLinks("https://example.com", null, null, null,
+                                             "@acme", null, null, null, null);
         var confidence   = new ConfidenceScore(0.88);
         var warning      = new ExtractionWarning("No secondary color found.");
         var issue        = new ValidationIssue("MISSING_LOGO", "No logo detected.", ValidationIssue.Severity.WARNING);
@@ -39,5 +40,7 @@ class DomainModelTest {
         assertThat(result.assets().logos()).hasSize(1);
         assertThat(result.warnings()).hasSize(1);
         assertThat(result.validationIssues().get(0).severity()).isEqualTo(ValidationIssue.Severity.WARNING);
+        assertThat(result.links().twitter()).isEqualTo("@acme");
+        assertThat(result.links().facebook()).isNull();
     }
 }
