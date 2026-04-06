@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.net.URI;
 import java.time.Instant;
@@ -189,6 +190,16 @@ public class GlobalExceptionHandler {
                         "The AI provider returned an error. Please retry.",
                         PROBLEM_BASE + "ai-provider-error",
                         request));
+    }
+
+    // -------------------------------------------------------------------------
+    // 404 — static resource not found (e.g. browser probes like /.well-known/*)
+    // -------------------------------------------------------------------------
+
+    /** Let Spring return its default 404 without ERROR-level logging. */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Void> handleNoResource() {
+        return ResponseEntity.notFound().build();
     }
 
     // -------------------------------------------------------------------------

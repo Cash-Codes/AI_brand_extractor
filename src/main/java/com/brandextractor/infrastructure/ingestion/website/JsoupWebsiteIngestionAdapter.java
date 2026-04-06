@@ -4,12 +4,15 @@ import com.brandextractor.domain.evidence.WebsiteEvidence;
 import com.brandextractor.domain.ports.WebsiteIngestionPort;
 import com.brandextractor.support.error.ExtractionException;
 import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -25,9 +28,9 @@ public class JsoupWebsiteIngestionAdapter implements WebsiteIngestionPort {
     private static final String USER_AGENT =
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
             "AppleWebKit/537.36 (KHTML, like Gecko) " +
-            "Chrome/120.0.0.0 Safari/537.36";
+            "Chrome/124.0.0.0 Safari/537.36";
 
-    private static final int  CONNECT_TIMEOUT_MS = 10_000;
+    private static final int  CONNECT_TIMEOUT_MS = 15_000;
     private static final int  MAX_BODY_BYTES      = 2 * 1024 * 1024; // 2 MB
     private static final int  MAX_HEADINGS        = 20;
     private static final int  MAX_IMAGES          = 30;
@@ -62,6 +65,15 @@ public class JsoupWebsiteIngestionAdapter implements WebsiteIngestionPort {
             Document doc = response.parse();
             return parseDocument(url, resolvedUrl, doc);
 
+        } catch (HttpStatusException e) {
+            throw new ExtractionException(
+                    "URL returned HTTP " + e.getStatusCode() + ": " + url, e);
+        } catch (UnknownHostException e) {
+            throw new ExtractionException(
+                    "Host not found: " + url, e);
+        } catch (SocketTimeoutException e) {
+            throw new ExtractionException(
+                    "Timed out fetching URL: " + url, e);
         } catch (IOException e) {
             throw new ExtractionException("Failed to fetch URL: " + url, e);
         }

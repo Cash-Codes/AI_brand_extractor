@@ -70,7 +70,7 @@ public class VertexAiResponseParser {
         String summary           = requireString(root, "summary");
         double summaryConf       = requireConfidence(root, "summaryConfidence");
         List<String> toneKeywords = parseStringArray(root, "toneKeywords");
-        String primaryColor      = requireHexColor(root, "primaryColor");
+        String primaryColor      = optionalHexColor(root, "primaryColor");
         String secondaryColor    = optionalHexColor(root, "secondaryColor");
         String textColor         = optionalHexColor(root, "textColor");
         String logoUrl           = optionalString(root, "logoUrl");
@@ -119,24 +119,12 @@ public class VertexAiResponseParser {
         return v;
     }
 
-    private static String requireHexColor(JsonNode root, String field) {
-        JsonNode node = root.get(field);
-        if (node == null || node.isNull() || !node.isTextual()) {
-            throw new MalformedAiResponseException("Required hex colour field '" + field + "' is missing");
-        }
-        String hex = node.asText().strip().toUpperCase();
-        if (!HEX_COLOR.matcher(hex).matches()) {
-            throw new MalformedAiResponseException(
-                    "Field '" + field + "' value '" + hex + "' is not a valid #RRGGBB hex colour");
-        }
-        return hex;
-    }
-
     private static String optionalHexColor(JsonNode root, String field) {
         JsonNode node = root.get(field);
         if (node == null || node.isNull() || !node.isTextual()) return null;
         String hex = node.asText().strip().toUpperCase();
-        if (hex.isBlank()) return null;
+        if (hex.isBlank() || hex.equals("NULL") || hex.equals("NONE")
+                || hex.equals("N/A") || hex.equals("UNKNOWN")) return null;
         if (!HEX_COLOR.matcher(hex).matches()) {
             log.warn("Field '{}' value '{}' is not valid #RRGGBB — ignoring", field, hex);
             return null;
