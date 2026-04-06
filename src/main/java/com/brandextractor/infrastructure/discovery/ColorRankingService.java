@@ -65,10 +65,16 @@ class ColorRankingService {
     private void collectFromWebsite(WebsiteEvidence w, Map<String, ColorCandidate> acc) {
         List<String> colors = w.cssColorCandidates();
         for (int i = 0; i < colors.size(); i++) {
-            String hex   = colors.get(i);
-            double base  = Math.max(0.50, 0.72 - i * 0.01);
+            String hex = colors.get(i);
+            // Position 0–1: theme-color / CSS brand vars — highest CSS signal
+            // Position 2+: utility stylesheet colours — decay quickly
+            double base = i == 0 ? 0.90
+                        : i == 1 ? 0.82
+                        : Math.max(0.45, 0.78 - i * 0.03);
             double score = penalise(base, hex);
-            String rationale = "CSS colour from website styles (position " + (i + 1) + ")";
+            String rationale = i < 2
+                    ? "Brand colour signal from SVG logo, OG image, theme-color, or CSS custom property"
+                    : "CSS colour from website styles (position " + (i + 1) + ")";
             offer(acc, hex, score, rationale, w.id());
         }
     }
@@ -83,8 +89,18 @@ class ColorRankingService {
     }
 
     /**
-     * Penalises near-white and near-black colours by −0.20 — they are structural
-     * scaffolding rather than brand palette colours.
+     * Penalises colours that are structural scaffolding rather than brand palette colours.
+     *
+     * <ul>
+     *   <li><b>Near-white</b> (lightness ≥ 0.75) or <b>near-black</b> (lightness ≤ 0.05): −0.25.
+     *       Catches light utility colors including Tailwind pastels such as
+     *       {@code pink-200} (#FEB2B2, L≈0.85) and {@code orange-200} (#FBD38D, L≈0.77)
+     *       which appear in CSS utility stylesheets but are not brand colours.</li>
+     *   <li><b>Low chroma</b> (max−min &lt; 38/255 ≈ 0.15): −0.20. Colours with very little
+     *       saturation are almost always neutral backgrounds or text, not brand accents.</li>
+     * </ul>
+     *
+     * <p>Penalties are applied independently and can stack.
      */
     static double penalise(double base, String hex) {
         if (hex == null || hex.length() < 7) return base;
@@ -92,8 +108,17 @@ class ColorRankingService {
             int r = Integer.parseInt(hex.substring(1, 3), 16);
             int g = Integer.parseInt(hex.substring(3, 5), 16);
             int b = Integer.parseInt(hex.substring(5, 7), 16);
-            double lightness = (Math.max(r, Math.max(g, b)) + Math.min(r, Math.min(g, b))) / 510.0;
-            if (lightness >= 0.95 || lightness <= 0.05) return Math.max(0.0, base - 0.20);
+            int max = Math.max(r, Math.max(g, b));
+            int min = Math.min(r, Math.min(g, b));
+            double lightness = (max + min) / 510.0;
+            double chroma    = (max - min) / 255.0;
+
+            double score = base;
+            // Near-white (≥0.75) or near-black (≤0.05) — background/text scaffolding
+            if (lightness >= 0.75 || lightness <= 0.05) score -= 0.25;
+            // Very low chroma — near-neutral, almost certainly not a brand accent
+            if (chroma < 0.15)                          score -= 0.20;
+            return Math.max(0.0, score);
         } catch (NumberFormatException ignored) { }
         return base;
     }

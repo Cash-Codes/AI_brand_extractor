@@ -30,7 +30,7 @@ public class VertexAiExtractionProperties {
 
     /** Maximum tokens to generate in a single response. */
     @Positive
-    private int maxOutputTokens = 2048;
+    private int maxOutputTokens = 4096;
 
     /**
      * Maximum number of times to retry parsing if the model returns malformed JSON.

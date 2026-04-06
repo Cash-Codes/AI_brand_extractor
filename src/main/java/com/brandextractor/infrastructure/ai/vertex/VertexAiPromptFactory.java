@@ -3,6 +3,7 @@ package com.brandextractor.infrastructure.ai.vertex;
 import com.brandextractor.domain.candidate.*;
 import com.brandextractor.domain.evidence.*;
 import com.brandextractor.infrastructure.ai.client.AiExtractionRequest;
+import com.brandextractor.domain.evidence.VisualEvidence;
 import com.google.cloud.vertexai.api.GenerationConfig;
 import com.google.cloud.vertexai.api.Schema;
 import com.google.cloud.vertexai.api.Type;
@@ -166,6 +167,13 @@ public class VertexAiPromptFactory {
                       .append(" (").append(f.width()).append("×").append(f.height()).append(")\n");
                     sb.append("Dominant colours: ")
                       .append(String.join(", ", f.dominantColors())).append("\n");
+                }
+                case VisualEvidence v -> {
+                    sb.append("### Visual analysis\n");
+                    if (v.dominantTheme() != null)
+                        sb.append("Theme: ").append(v.dominantTheme()).append("\n");
+                    if (!v.detectedLabels().isEmpty())
+                        sb.append("Labels: ").append(String.join(", ", v.detectedLabels())).append("\n");
                 }
                 default -> { }
             }
