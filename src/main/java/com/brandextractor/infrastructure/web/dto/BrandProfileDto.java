@@ -4,6 +4,9 @@ import java.util.List;
 
 public record BrandProfileDto(
         String brandName,
+        double brandNameConfidence,
         String tagline,
+        double taglineConfidence,
         String summary,
+        double summaryConfidence,
         List<String> toneKeywords) {}

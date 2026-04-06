@@ -11,7 +11,11 @@ class DomainModelTest {
 
     @Test
     void extractionResult_canBeConstructed() {
-        var brandProfile = new BrandProfile("Acme", "Bold digital", "A studio.", List.of("modern"));
+        var brandProfile = new BrandProfile(
+                new Confident<>("Acme", 0.94),
+                new Confident<>("Bold digital", 0.87),
+                new Confident<>("A studio.", 0.91),
+                List.of("modern"));
         var colorValue   = new ColorValue("#0F172A", 0.93, List.of("color-1"));
         var colors       = new ColorSelection(colorValue, colorValue, colorValue);
         var assetItem    = new AssetItem("https://example.com/logo.svg", AssetRole.PRIMARY_LOGO,
@@ -29,7 +33,8 @@ class DomainModelTest {
                 List.of(warning), List.of(issue), 8, 12, 0, true);
 
         assertThat(result.inputType()).isEqualTo(ExtractionInputType.URL);
-        assertThat(result.brandProfile().brandName()).isEqualTo("Acme");
+        assertThat(result.brandProfile().brandName().value()).isEqualTo("Acme");
+        assertThat(result.brandProfile().brandName().confidence()).isEqualTo(0.94);
         assertThat(result.colors().primary().value()).isEqualTo("#0F172A");
         assertThat(result.assets().logos()).hasSize(1);
         assertThat(result.warnings()).hasSize(1);

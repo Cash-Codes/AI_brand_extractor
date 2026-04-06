@@ -19,7 +19,13 @@ public interface ExtractionResultMapper {
     @Mapping(target = "evidenceSummary.usedScreenshot",     source = "usedScreenshot")
     ExtractionResponse toResponse(ExtractionResult result);
 
-    BrandProfileDto   toBrandProfileDto(BrandProfile profile);
+    @Mapping(target = "brandName",           expression = "java(profile.brandName().value())")
+    @Mapping(target = "brandNameConfidence", expression = "java(profile.brandName().confidence())")
+    @Mapping(target = "tagline",             expression = "java(profile.tagline().value())")
+    @Mapping(target = "taglineConfidence",   expression = "java(profile.tagline().confidence())")
+    @Mapping(target = "summary",             expression = "java(profile.summary().value())")
+    @Mapping(target = "summaryConfidence",   expression = "java(profile.summary().confidence())")
+    BrandProfileDto toBrandProfileDto(BrandProfile profile);
     ColorSelectionDto toColorSelectionDto(ColorSelection colors);
     ColorValueDto     toColorValueDto(ColorValue colorValue);
     AssetSelectionDto toAssetSelectionDto(AssetSelection assets);
