@@ -37,9 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Validates that the real {@link com.brandextractor.support.error.GlobalExceptionHandler}
  * produces correctly structured RFC 7807 ProblemDetail responses for every error path.
  */
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-        properties = "vertexai.project-id=test-project")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 class ExtractionErrorHandlingIntegrationTest {
 

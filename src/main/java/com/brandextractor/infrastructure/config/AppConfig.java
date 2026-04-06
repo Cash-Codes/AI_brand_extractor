@@ -2,6 +2,7 @@ package com.brandextractor.infrastructure.config;
 
 import com.brandextractor.infrastructure.ai.vertex.VertexAiExtractionProperties;
 import com.google.cloud.vertexai.VertexAI;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ public class AppConfig {
 
     @Bean
     @Lazy
+    @ConditionalOnProperty(name = "vertexai.enabled", havingValue = "true")
     public VertexAI vertexAI() throws IOException {
         return new VertexAI(props.getProjectId(), props.getLocation());
     }

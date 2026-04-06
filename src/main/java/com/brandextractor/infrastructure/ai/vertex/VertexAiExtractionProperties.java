@@ -2,24 +2,26 @@ package com.brandextractor.infrastructure.ai.vertex;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.validation.annotation.Validated;
 
 @ConfigurationProperties(prefix = "vertexai")
 @Data
-@Validated
 public class VertexAiExtractionProperties {
 
-    @NotBlank
-    private String projectId;
+    /**
+     * Whether Vertex AI integration is active. Set to {@code true} only when
+     * {@code VERTEXAI_PROJECT_ID} and application credentials are configured.
+     * Defaults to {@code false} — mock responses are returned instead.
+     */
+    private boolean enabled = false;
 
-    @NotBlank
+    /** GCP project that hosts the Vertex AI endpoint. Required when {@code enabled=true}. */
+    private String projectId = "";
+
     private String location = "us-central1";
 
-    @NotBlank
     private String modelId = "gemini-2.0-flash-001";
 
     /** Temperature for generation — 0.0 = fully deterministic. */

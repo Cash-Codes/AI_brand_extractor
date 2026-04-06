@@ -1,0 +1,23 @@
+# Local developer profile (default when SPRING_PROFILES_ACTIVE is unset).
+# Vertex AI is intentionally disabled — the mock client returns labelled stub
+# data so the full HTTP pipeline can be exercised without GCP credentials.
+
+vertexai:
+  enabled: false   # override to true + set VERTEXAI_PROJECT_ID to use real Gemini
+
+logging:
+  level:
+    root: INFO
+    com.brandextractor: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{36}) - %msg%n"
+
+server:
+  port: 8080
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB

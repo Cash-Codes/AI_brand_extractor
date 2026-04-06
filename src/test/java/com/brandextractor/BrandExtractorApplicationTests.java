@@ -1,15 +1,12 @@
 package com.brandextractor;
 
-import com.google.cloud.vertexai.VertexAI;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@SpringBootTest(properties = "vertexai.project-id=test-project")
+// vertexai.enabled defaults to false → MockBrandExtractionAiClient is active,
+// no GCP credentials or project-id required for the context to load.
+@SpringBootTest
 class BrandExtractorApplicationTests {
-
-    @MockitoBean
-    VertexAI vertexAI;
 
     @Test
     void contextLoads() {
