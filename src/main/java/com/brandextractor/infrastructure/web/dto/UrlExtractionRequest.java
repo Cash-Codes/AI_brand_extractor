@@ -8,8 +8,7 @@ import jakarta.validation.constraints.Pattern;
 public record UrlExtractionRequest(
 
         @Schema(
-                description = "Publicly reachable URL to extract brand data from. " +
-                              "Must begin with http:// or https://.",
+                description = "URL to extract brand data from. Must begin with http:// or https://.",
                 example = "https://www.acmestudio.com")
         @NotBlank(message = "url must not be blank")
         @Pattern(regexp = "^https?://.*", message = "url must start with http:// or https://")

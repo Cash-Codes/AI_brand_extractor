@@ -26,6 +26,6 @@ springdoc:
     path: /v3/api-docs
 
 vertexai:
-  project-id: ${VERTEXAI_PROJECT_ID:placeholder}
+  project-id: ${VERTEXAI_PROJECT_ID:}
   location: us-central1
   model-id: gemini-2.0-flash-001

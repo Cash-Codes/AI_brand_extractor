@@ -6,6 +6,7 @@ import com.brandextractor.infrastructure.web.dto.ExtractionResponse;
 import com.brandextractor.infrastructure.web.dto.UrlExtractionRequest;
 import com.brandextractor.infrastructure.web.mapper.ExtractionResultMapper;
 import com.brandextractor.support.error.ExtractionException;
+import com.brandextractor.support.util.MimeTypeUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,7 +23,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 @Tag(name = "Extractions",
      description = "Extract structured brand profiles from public URLs or uploaded image files")
@@ -32,6 +37,10 @@ import java.io.IOException;
 public class ExtractionController {
 
     private static final String PROBLEM_JSON = "application/problem+json";
+
+    private static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/png", "image/jpeg");
+    private static final List<MediaType> ALLOWED_MEDIA_TYPES =
+            List.of(MediaType.IMAGE_PNG, MediaType.IMAGE_JPEG);
 
     private static final String URL_REQUEST_EXAMPLE = """
             {
@@ -116,6 +125,7 @@ public class ExtractionController {
     private final UrlExtractionUseCase urlExtractionUseCase;
     private final FileExtractionUseCase fileExtractionUseCase;
     private final ExtractionResultMapper mapper;
+    private final MimeTypeUtils mimeTypeUtils;
 
     // -------------------------------------------------------------------------
     // POST /url
@@ -229,12 +239,18 @@ public class ExtractionController {
             @Parameter(
                     description = "Pass `evidence` to include the full raw evidence payload in the response",
                     example = "evidence")
-            @RequestParam(name = "include", defaultValue = "") String include) {
+            @RequestParam(name = "include", defaultValue = "") String include)
+            throws HttpMediaTypeNotSupportedException {
 
         boolean includeEvidence = "evidence".equals(include);
         try {
-            var result = fileExtractionUseCase.extract(
-                    file.getBytes(), file.getContentType(), sourceLabel);
+            byte[] bytes = file.getBytes();
+            String detectedMime = mimeTypeUtils.detectMimeType(bytes);
+            if (!ALLOWED_MIME_TYPES.contains(detectedMime)) {
+                throw new HttpMediaTypeNotSupportedException(
+                        MediaType.parseMediaType(detectedMime), ALLOWED_MEDIA_TYPES);
+            }
+            var result = fileExtractionUseCase.extract(bytes, detectedMime, sourceLabel);
             return ResponseEntity.ok(mapper.toResponse(result, includeEvidence));
         } catch (IOException e) {
             throw new ExtractionException("Failed to read uploaded file", e);

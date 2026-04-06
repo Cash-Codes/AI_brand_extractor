@@ -3,10 +3,12 @@ package com.brandextractor.infrastructure.web.controller;
 import com.brandextractor.application.extraction.FileExtractionUseCase;
 import com.brandextractor.application.extraction.UrlExtractionUseCase;
 import com.brandextractor.domain.model.*;
+import com.brandextractor.support.util.MimeTypeUtils;
 import com.brandextractor.infrastructure.web.dto.*;
 import com.brandextractor.infrastructure.web.mapper.ExtractionResultMapper;
 import com.brandextractor.support.error.AiProviderException;
 import com.brandextractor.support.error.ExtractionException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -40,6 +42,14 @@ class ExtractionControllerTest {
 
     @MockitoBean
     private ExtractionResultMapper mapper;
+
+    @MockitoBean
+    private MimeTypeUtils mimeTypeUtils;
+
+    @BeforeEach
+    void setUp() {
+        when(mimeTypeUtils.detectMimeType(any())).thenReturn("image/png");
+    }
 
     // =========================================================================
     // POST /url — validation
