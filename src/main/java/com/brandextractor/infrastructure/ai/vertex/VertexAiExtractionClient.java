@@ -5,6 +5,7 @@ import com.brandextractor.infrastructure.ai.client.AiExtractionResponse;
 import com.brandextractor.infrastructure.ai.client.BrandExtractionAiClient;
 import com.brandextractor.support.error.AiProviderException;
 import com.google.cloud.vertexai.VertexAI;
+import com.google.cloud.vertexai.api.Candidate;
 import com.google.cloud.vertexai.api.GenerateContentResponse;
 import com.google.cloud.vertexai.api.Content;
 import com.google.cloud.vertexai.generativeai.ContentMaker;
@@ -75,6 +76,18 @@ public class VertexAiExtractionClient implements BrandExtractionAiClient {
             String prompt = attempt == 0 ? userPrompt : userPrompt + RETRY_SUFFIX;
             try {
                 GenerateContentResponse response = model.generateContent(prompt);
+
+                // Detect truncation before attempting to parse — retrying won't help
+                if (!response.getCandidatesList().isEmpty()) {
+                    Candidate.FinishReason reason = response.getCandidates(0).getFinishReason();
+                    if (reason == Candidate.FinishReason.MAX_TOKENS) {
+                        throw new AiProviderException(
+                                "Vertex AI response was truncated (MAX_TOKENS). " +
+                                "Increase vertexai.max-output-tokens (currently " +
+                                props.getMaxOutputTokens() + ").");
+                    }
+                }
+
                 String rawJson = ResponseHandler.getText(response);
                 log.debug("Vertex AI raw response (attempt {}): {}", attempt + 1, rawJson);
 

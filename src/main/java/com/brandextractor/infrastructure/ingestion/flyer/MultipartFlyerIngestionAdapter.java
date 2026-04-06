@@ -3,6 +3,7 @@ package com.brandextractor.infrastructure.ingestion.flyer;
 import com.brandextractor.domain.evidence.FlyerEvidence;
 import com.brandextractor.domain.ports.FlyerIngestionPort;
 import com.brandextractor.support.error.ExtractionException;
+import com.brandextractor.support.util.ImageColorSampler;
 import com.brandextractor.support.util.MimeTypeUtils;
 import org.springframework.stereotype.Component;
 
@@ -11,9 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,9 +22,6 @@ public class MultipartFlyerIngestionAdapter implements FlyerIngestionPort {
     static final long MAX_FILE_BYTES       = 10L * 1024 * 1024; // 10 MB
     static final int  MAX_DOMINANT_COLORS  = 5;
     static final int  MAX_SAMPLE_PIXELS    = 10_000;
-
-    // Quantise each channel into 8 buckets (256 / 32 = 8)
-    private static final int QUANTIZE_STEP = 32;
 
     private static final Set<String> SUPPORTED_TYPES = Set.of("image/jpeg", "image/png");
 
@@ -76,33 +72,11 @@ public class MultipartFlyerIngestionAdapter implements FlyerIngestionPort {
     }
 
     /**
-     * Samples the image on a grid and returns up to {@value #MAX_DOMINANT_COLORS} hex colours
-     * ordered by frequency (most frequent first). Each channel is quantised to 8 buckets so
-     * near-identical shades collapse into a single representative colour.
-     *
-     * <p>Fully-transparent pixels (alpha &lt; 128) are skipped.
+     * Samples the image and returns up to {@value #MAX_DOMINANT_COLORS} dominant hex colours.
+     * Delegates to {@link ImageColorSampler}.
      */
     List<String> extractDominantColors(BufferedImage image) {
-        int step = Math.max(1,
-                (int) Math.sqrt((long) image.getWidth() * image.getHeight() / MAX_SAMPLE_PIXELS));
-
-        Map<Integer, Integer> counts = new HashMap<>();
-
-        for (int y = 0; y < image.getHeight(); y += step) {
-            for (int x = 0; x < image.getWidth(); x += step) {
-                int argb  = image.getRGB(x, y);
-                int alpha = (argb >> 24) & 0xFF;
-                if (alpha < 128) continue;                      // ignore transparent
-                int quantized = quantizeRgb(argb & 0x00FFFFFF);
-                counts.merge(quantized, 1, Integer::sum);
-            }
-        }
-
-        return counts.entrySet().stream()
-                .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
-                .limit(MAX_DOMINANT_COLORS)
-                .map(e -> String.format("#%06X", e.getKey()))
-                .toList();
+        return ImageColorSampler.dominantColors(image);
     }
 
     // -------------------------------------------------------------------------
@@ -126,10 +100,4 @@ public class MultipartFlyerIngestionAdapter implements FlyerIngestionPort {
         return detected;
     }
 
-    private static int quantizeRgb(int rgb) {
-        int r = ((rgb >> 16) & 0xFF) / QUANTIZE_STEP * QUANTIZE_STEP;
-        int g = ((rgb >>  8) & 0xFF) / QUANTIZE_STEP * QUANTIZE_STEP;
-        int b = ( rgb        & 0xFF) / QUANTIZE_STEP * QUANTIZE_STEP;
-        return (r << 16) | (g << 8) | b;
-    }
 }

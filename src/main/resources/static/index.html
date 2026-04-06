@@ -270,28 +270,47 @@
       font-size: 11px;
       color: var(--text-dim);
     }
-    .file-chosen {
+    .flyer-preview {
       display: none;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      background: var(--bg);
+      margin-top: 12px;
       border: 1px solid var(--border);
       border-radius: var(--r);
+      overflow: hidden;
+      background: var(--bg-deep);
+    }
+    .flyer-preview.visible { display: block; }
+    .flyer-preview img {
+      display: block;
+      width: 100%;
+      max-height: 260px;
+      object-fit: contain;
+      background: repeating-conic-gradient(#80808022 0% 25%, transparent 0% 50%)
+                  0 0 / 14px 14px;
+    }
+    .flyer-preview-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
       font-family: var(--font-m);
       font-size: 12px;
-      color: var(--text-mid);
-      margin-top: 12px;
     }
-    .file-chosen.visible { display: flex; }
-    .file-chosen-name { flex: 1; color: var(--text); }
-    .file-clear {
+    .flyer-preview-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--text-mid);
+    }
+    .flyer-preview-clear {
+      flex-shrink: 0;
       background: none; border: none; color: var(--text-dim);
       cursor: pointer; font-size: 16px; line-height: 1;
       padding: 0 2px;
       transition: color 0.15s;
     }
-    .file-clear:hover { color: var(--danger); }
+    .flyer-preview-clear:hover { color: var(--danger); }
 
     /* options bar */
     .options-bar {
@@ -1019,10 +1038,12 @@
         </button>
         <div class="drop-hint" style="margin-top:10px">or drag &amp; drop · JPEG · PNG · Max 10 MB</div>
       </div>
-      <div class="file-chosen" id="fileChosen">
-        <span>📎</span>
-        <span class="file-chosen-name" id="fileChosenName"></span>
-        <button class="file-clear" onclick="clearFile(event)" title="Remove">×</button>
+      <div class="flyer-preview" id="flyerPreview">
+        <img id="flyerPreviewImg" alt="Flyer preview">
+        <div class="flyer-preview-footer">
+          <span class="flyer-preview-name" id="flyerPreviewName"></span>
+          <button class="flyer-preview-clear" onclick="clearFile(event)" title="Remove">×</button>
+        </div>
       </div>
       <div class="source-label-row" id="sourceLabelRow">
         <span class="input-label">Label</span>
@@ -1228,8 +1249,12 @@
   }
   function applyFile(file) {
     chosenFile = file;
-    document.getElementById('fileChosen').classList.add('visible');
-    document.getElementById('fileChosenName').textContent = file.name;
+    const img = document.getElementById('flyerPreviewImg');
+    const url = URL.createObjectURL(file);
+    img.onload = () => URL.revokeObjectURL(url);
+    img.src = url;
+    document.getElementById('flyerPreviewName').textContent = file.name;
+    document.getElementById('flyerPreview').classList.add('visible');
     document.getElementById('dropZone').classList.remove('visible');
     document.getElementById('sourceLabelRow').classList.add('visible');
     document.getElementById('clearUploadBtn').style.display = 'inline-flex';
@@ -1238,7 +1263,9 @@
   function clearFile(e) {
     if (e) e.stopPropagation();
     chosenFile = null;
-    document.getElementById('fileChosen').classList.remove('visible');
+    const img = document.getElementById('flyerPreviewImg');
+    img.src = '';
+    document.getElementById('flyerPreview').classList.remove('visible');
     document.getElementById('dropZone').classList.add('visible');
     document.getElementById('sourceLabelRow').classList.remove('visible');
     document.getElementById('clearUploadBtn').style.display = 'none';

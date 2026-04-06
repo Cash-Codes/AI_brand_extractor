@@ -236,10 +236,11 @@ class JsoupWebsiteIngestionAdapterTest {
 
     @Test
     void extractsHexColorsFromStyleTag() {
+        // Use chromatic colours — non-chromatic (low chroma / near-neutral) are filtered out
         var ev = parse("<html><head>" +
-                "<style>body { color: #1A2B3C; } .btn { background: #AABBCC; }</style>" +
+                "<style>body { color: #1E3A8A; } .btn { background: #E63946; }</style>" +
                 "</head><body></body></html>");
-        assertThat(ev.cssColorCandidates()).contains("#1A2B3C", "#AABBCC");
+        assertThat(ev.cssColorCandidates()).contains("#1E3A8A", "#E63946");
     }
 
     @Test

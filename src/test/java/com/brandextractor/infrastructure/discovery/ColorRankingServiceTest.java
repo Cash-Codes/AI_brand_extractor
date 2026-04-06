@@ -80,23 +80,27 @@ class ColorRankingServiceTest {
 
     @Test
     void nearWhiteIsPenalised() {
-        double base     = ColorRankingService.penalise(0.90, "#FFFFFF");
-        double midtone  = ColorRankingService.penalise(0.90, "#FF6600");
+        // #FFFFFF: lightness=1.0 (≥0.75 → -0.25) + chroma=0 (<0.15 → -0.20) = 0.45
+        double white   = ColorRankingService.penalise(0.90, "#FFFFFF");
+        double midtone = ColorRankingService.penalise(0.90, "#FF6600");
 
-        assertThat(base).isLessThan(midtone);
-        assertThat(base).isCloseTo(0.70, within(1e-9));
+        assertThat(white).isLessThan(midtone);
+        assertThat(white).isCloseTo(0.45, within(1e-9));
     }
 
     @Test
     void nearBlackIsPenalised() {
-        double base    = ColorRankingService.penalise(0.90, "#000000");
+        // #000000: lightness=0 (≤0.05 → -0.25) + chroma=0 (<0.15 → -0.20) = 0.45
+        double black   = ColorRankingService.penalise(0.90, "#000000");
         double midtone = ColorRankingService.penalise(0.90, "#336699");
 
-        assertThat(base).isLessThan(midtone);
+        assertThat(black).isLessThan(midtone);
+        assertThat(black).isCloseTo(0.45, within(1e-9));
     }
 
     @Test
     void midtoneColorNotPenalised() {
+        // #3B82F6: lightness≈0.598, chroma≈0.733 — no penalty
         double score = ColorRankingService.penalise(0.85, "#3B82F6");
         assertThat(score).isEqualTo(0.85);
     }
@@ -105,6 +109,47 @@ class ColorRankingServiceTest {
     void penaltyDoesNotGoNegative() {
         double score = ColorRankingService.penalise(0.10, "#FFFFFF");
         assertThat(score).isGreaterThanOrEqualTo(0.0);
+    }
+
+    @Test
+    void tailwindPastelPinkIsPenalised() {
+        // #FEB2B2 (Tailwind pink-200): lightness≈0.847 (≥0.75 → -0.25), chroma≈0.298 → -0.25 total
+        double pastel = ColorRankingService.penalise(0.70, "#FEB2B2");
+        double brand  = ColorRankingService.penalise(0.70, "#E40043"); // CRUK pink
+
+        assertThat(pastel).isLessThan(brand);
+        assertThat(pastel).isCloseTo(0.45, within(1e-9));
+        assertThat(brand).isEqualTo(0.70);
+    }
+
+    @Test
+    void tailwindPastelOrangeIsPenalised() {
+        // #FBD38D (Tailwind orange-200): lightness≈0.769 (≥0.75 → -0.25), chroma≈0.431 → -0.25 total
+        double pastel = ColorRankingService.penalise(0.70, "#FBD38D");
+        double brand  = ColorRankingService.penalise(0.70, "#FF6B00");
+
+        assertThat(pastel).isLessThan(brand);
+        assertThat(pastel).isCloseTo(0.45, within(1e-9));
+    }
+
+    @Test
+    void tailwindUtilityGrayIsPenalised() {
+        // #EDF2F7 (Tailwind gray-100): both penalties
+        double utility = ColorRankingService.penalise(0.70, "#EDF2F7");
+        double brand   = ColorRankingService.penalise(0.70, "#E40043");
+
+        assertThat(utility).isLessThan(brand);
+        assertThat(brand).isEqualTo(0.70);
+    }
+
+    @Test
+    void lowChromaNeutralIsPenalised() {
+        // #AAAAAA: lightness≈0.667 (no near-white/black), chroma=0 → -0.20 only
+        double neutral = ColorRankingService.penalise(0.70, "#AAAAAA");
+        double accent  = ColorRankingService.penalise(0.70, "#E40043");
+
+        assertThat(neutral).isCloseTo(0.50, within(1e-9));
+        assertThat(accent).isEqualTo(0.70);
     }
 
     // -------------------------------------------------------------------------
