@@ -1,6 +1,6 @@
 package com.brandextractor.infrastructure.config;
 
-import com.brandextractor.infrastructure.ai.vertex.VertexAiProperties;
+import com.brandextractor.infrastructure.ai.vertex.VertexAiExtractionProperties;
 import com.google.cloud.vertexai.VertexAI;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -10,12 +10,12 @@ import org.springframework.context.annotation.Lazy;
 import java.io.IOException;
 
 @Configuration
-@EnableConfigurationProperties(VertexAiProperties.class)
+@EnableConfigurationProperties(VertexAiExtractionProperties.class)
 public class AppConfig {
 
-    private final VertexAiProperties props;
+    private final VertexAiExtractionProperties props;
 
-    public AppConfig(VertexAiProperties props) {
+    public AppConfig(VertexAiExtractionProperties props) {
         this.props = props;
     }
 

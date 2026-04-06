@@ -1,6 +1,6 @@
 package com.brandextractor.infrastructure.ocr;
 
-import com.brandextractor.infrastructure.ai.vertex.VertexAiProperties;
+import com.brandextractor.infrastructure.ai.vertex.VertexAiExtractionProperties;
 import com.google.cloud.vertexai.VertexAI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +37,9 @@ public class VertexOcrClient implements OcrClient {
     private static final Logger log = LoggerFactory.getLogger(VertexOcrClient.class);
 
     private final VertexAI vertexAI;
-    private final VertexAiProperties props;
+    private final VertexAiExtractionProperties props;
 
-    public VertexOcrClient(@Lazy @Autowired VertexAI vertexAI, VertexAiProperties props) {
+    public VertexOcrClient(@Lazy @Autowired VertexAI vertexAI, VertexAiExtractionProperties props) {
         this.vertexAI = vertexAI;
         this.props    = props;
     }
