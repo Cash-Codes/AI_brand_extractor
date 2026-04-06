@@ -173,11 +173,10 @@ class VertexAiResponseParserTest {
     }
 
     @Test
-    void throwsWhenPrimaryColorMissing() {
+    void primaryColorIsNullWhenMissing() {
         String json = validJsonWithout("primaryColor");
-        assertThatThrownBy(() -> parser.parse(json))
-                .isInstanceOf(MalformedAiResponseException.class)
-                .hasMessageContaining("primaryColor");
+        AiExtractionResponse r = parser.parse(json);
+        assertThat(r.primaryColor()).isNull();
     }
 
     @Test
@@ -189,11 +188,17 @@ class VertexAiResponseParserTest {
     }
 
     @Test
-    void throwsWhenPrimaryColorNotHexFormat() {
+    void primaryColorIsNullWhenNotHexFormat() {
         String json = minimalJson("\"primaryColor\": \"red\"");
-        assertThatThrownBy(() -> parser.parse(json))
-                .isInstanceOf(MalformedAiResponseException.class)
-                .hasMessageContaining("primaryColor");
+        AiExtractionResponse r = parser.parse(json);
+        assertThat(r.primaryColor()).isNull();
+    }
+
+    @Test
+    void primaryColorIsNullWhenNullSentinel() {
+        String json = minimalJson("\"primaryColor\": \"NULL\"");
+        AiExtractionResponse r = parser.parse(json);
+        assertThat(r.primaryColor()).isNull();
     }
 
     @Test
