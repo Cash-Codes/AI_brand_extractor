@@ -3,7 +3,7 @@ package com.brandextractor.domain.model;
 import java.util.List;
 
 public record BrandProfile(
-        String brandName,
-        String tagline,
-        String summary,
+        Confident<String> brandName,
+        Confident<String> tagline,
+        Confident<String> summary,
         List<String> toneKeywords) {}
