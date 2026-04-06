@@ -13,9 +13,13 @@ class EvidenceTest {
 
     @Test
     void websiteEvidence_implementsEvidence() {
-        Evidence evidence = new WebsiteEvidence("id-1", "WEBSITE", "https://example.com",
-                "Acme Studio", "A design studio", "https://example.com/",
-                List.of("H1: Acme"), "<html>...</html>", 0.95, NOW);
+        Evidence evidence = new WebsiteEvidence(
+                "id-1", "WEBSITE", "https://example.com", "https://example.com/",
+                "Acme Studio", "A design studio", "Acme Studio builds digital products.",
+                List.of("H1: Acme"), "https://example.com/favicon.ico",
+                List.of("https://example.com/logo.png"), List.of(), List.of(),
+                null, null, null, null, null, null,
+                0.95, NOW);
 
         assertThat(evidence.id()).isEqualTo("id-1");
         assertThat(evidence.sourceType()).isEqualTo("WEBSITE");

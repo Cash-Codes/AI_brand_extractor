@@ -6,11 +6,35 @@ import java.util.List;
 public record WebsiteEvidence(
         String id,
         String sourceType,
-        String sourceReference,
-        String title,
-        String metaDescription,
-        String resolvedUrl,
-        List<String> headings,
-        String htmlSnippet,
+        String sourceReference,          // original requested URL
+        String resolvedUrl,              // final URL after redirects
+
+        // --- page content ---
+        String title,                    // <title> tag
+        String metaDescription,          // <meta name="description">
+        String visibleText,              // truncated visible body text (no markup)
+        List<String> headings,           // h1–h3 text in document order
+
+        // --- assets ---
+        String faviconUrl,
+        List<String> imageUrls,          // src/data-src from <img> tags
+
+        // --- social & contact links ---
+        List<String> socialLinks,        // href for known platforms + mailto: + tel:
+
+        // --- colours ---
+        List<String> cssColorCandidates, // normalised hex from inline styles + <style>
+
+        // --- Open Graph ---
+        String ogTitle,
+        String ogDescription,
+        String ogImage,
+        String ogSiteName,
+
+        // --- Twitter Card ---
+        String twitterCard,
+        String twitterImage,
+
+        // --- provenance ---
         double confidence,
         Instant extractedAt) implements Evidence {}

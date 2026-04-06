@@ -50,7 +50,10 @@ public interface ExtractionResultMapper {
     default EvidenceDto toEvidenceDto(Evidence evidence) {
         return switch (evidence) {
             case WebsiteEvidence e    -> new WebsiteEvidenceDto(e.id(), e.sourceType(), e.sourceReference(),
-                                             e.title(), e.metaDescription(), e.resolvedUrl(), e.headings(), e.htmlSnippet());
+                                             e.resolvedUrl(), e.title(), e.metaDescription(), e.visibleText(),
+                                             e.headings(), e.faviconUrl(), e.imageUrls(), e.socialLinks(),
+                                             e.cssColorCandidates(), e.ogTitle(), e.ogDescription(),
+                                             e.ogImage(), e.ogSiteName(), e.twitterCard(), e.twitterImage());
             case FlyerEvidence e      -> new FlyerEvidenceDto(e.id(), e.sourceType(), e.sourceReference(),
                                              e.mimeType(), e.width(), e.height(), e.sizeBytes());
             case OcrEvidence e        -> new OcrEvidenceDto(e.id(), e.sourceType(), e.sourceReference(),
