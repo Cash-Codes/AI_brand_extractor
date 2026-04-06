@@ -22,11 +22,12 @@ public class FileExtractionService implements FileExtractionUseCase {
     private static final Set<String> SUPPORTED_MIME_TYPES = Set.of("image/jpeg", "image/png");
     private static final long MAX_FILE_BYTES = 10L * 1024 * 1024; // 10 MB
 
-    private final FlyerIngestionPort      flyerIngestionPort;
-    private final OcrPort                 ocrPort;
-    private final VisualAnalysisPort      visualAnalysisPort;
-    private final AIAnalysisPort          aiAnalysisPort;
-    private final ExtractionValidationPort validationPort;
+    private final FlyerIngestionPort          flyerIngestionPort;
+    private final OcrPort                     ocrPort;
+    private final VisualAnalysisPort          visualAnalysisPort;
+    private final AIAnalysisPort              aiAnalysisPort;
+    private final ExtractionNormalizationPort normalizationPort;
+    private final ExtractionValidationPort    validationPort;
 
     @Override
     public ExtractionResult extract(byte[] imageBytes, String mimeType, String sourceLabel) {
@@ -46,12 +47,15 @@ public class FileExtractionService implements FileExtractionUseCase {
         // 4. Analyse all collected evidence with the AI model
         ExtractionResult base = aiAnalysisPort.analyse(List.copyOf(evidence));
 
-        // 5. Post-extraction validation
-        var issues = validationPort.validate(base);
+        // 5. Normalise AI output: trim text, sanitise URLs, detect conflicts
+        ExtractionResult normalised = normalizationPort.normalize(base);
 
-        // 6. Stamp correct source metadata and evidence counts
+        // 6. Post-extraction validation
+        var issues = validationPort.validate(normalised);
+
+        // 7. Stamp correct source metadata and evidence counts
         return ResultEnricher.enrich(
-                base,
+                normalised,
                 ExtractionInputType.FILE,
                 sourceLabel,
                 null,

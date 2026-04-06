@@ -22,12 +22,13 @@ import static org.mockito.Mockito.*;
 
 class UrlExtractionServiceTest {
 
-    private WebsiteIngestionPort     websiteIngestionPort;
-    private ScreenshotPort           screenshotPort;
-    private VisualAnalysisPort       visualAnalysisPort;
-    private AIAnalysisPort           aiAnalysisPort;
-    private ExtractionValidationPort validationPort;
-    private UrlExtractionService     service;
+    private WebsiteIngestionPort        websiteIngestionPort;
+    private ScreenshotPort              screenshotPort;
+    private VisualAnalysisPort          visualAnalysisPort;
+    private AIAnalysisPort              aiAnalysisPort;
+    private ExtractionNormalizationPort normalizationPort;
+    private ExtractionValidationPort    validationPort;
+    private UrlExtractionService        service;
 
     @BeforeEach
     void setUp() {
@@ -35,13 +36,15 @@ class UrlExtractionServiceTest {
         screenshotPort       = mock(ScreenshotPort.class);
         visualAnalysisPort   = mock(VisualAnalysisPort.class);
         aiAnalysisPort       = mock(AIAnalysisPort.class);
+        normalizationPort    = mock(ExtractionNormalizationPort.class);
         validationPort       = mock(ExtractionValidationPort.class);
         service = new UrlExtractionService(
                 websiteIngestionPort, screenshotPort, visualAnalysisPort,
-                aiAnalysisPort, validationPort);
+                aiAnalysisPort, normalizationPort, validationPort);
 
         // defaults
         when(screenshotPort.capture(any())).thenReturn(Optional.empty());
+        when(normalizationPort.normalize(any())).thenAnswer(inv -> inv.getArgument(0));
         when(validationPort.validate(any())).thenReturn(List.of());
     }
 
