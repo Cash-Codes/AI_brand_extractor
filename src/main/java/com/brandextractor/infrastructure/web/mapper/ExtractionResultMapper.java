@@ -7,6 +7,8 @@ import com.brandextractor.infrastructure.web.dto.evidence.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface ExtractionResultMapper {
 
@@ -20,7 +22,7 @@ public interface ExtractionResultMapper {
     @Mapping(target = "evidenceSummary.ocrBlockCount",      source = "result.ocrBlockCount")
     @Mapping(target = "evidenceSummary.usedScreenshot",     source = "result.usedScreenshot")
     @Mapping(target = "evidence",
-             expression = "java(includeEvidence ? result.evidence().stream().map(this::toEvidenceDto).toList() : null)")
+             expression = "java(includeEvidence ? toEvidenceDtoList(result.evidence()) : null)")
     ExtractionResponse toResponse(ExtractionResult result, boolean includeEvidence);
 
     @Mapping(target = "brandName",           expression = "java(profile.brandName().value())")
@@ -40,6 +42,10 @@ public interface ExtractionResultMapper {
 
     ContactLinksDto toContactLinksDto(ContactLinks links);
     ConfidenceDto   toConfidenceDto(ConfidenceScore score);
+
+    default List<EvidenceDto> toEvidenceDtoList(List<Evidence> list) {
+        return list.stream().map(this::toEvidenceDto).toList();
+    }
 
     default EvidenceDto toEvidenceDto(Evidence evidence) {
         return switch (evidence) {
