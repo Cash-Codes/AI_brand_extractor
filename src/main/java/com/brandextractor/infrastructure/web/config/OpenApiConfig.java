@@ -4,13 +4,17 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
@@ -22,13 +26,26 @@ public class OpenApiConfig {
                         .title("Brand Extractor API")
                         .description("""
                                 Multimodal brand extraction service powered by Vertex AI Gemini.
-                                Extracts brand profile, colour palette, asset inventory, social/contact
-                                links, and confidence scores from a public URL or an uploaded image file.
+
+                                Extracts a structured brand profile — colour palette, logo and hero assets, \
+                                social/contact links, tagline, summary, and per-field confidence scores — \
+                                from a public URL or an uploaded JPEG/PNG image file.
+
+                                ## Optional evidence payload
+                                Append `?include=evidence` to any extraction endpoint to receive the full \
+                                raw evidence collected during extraction (website HTML signals, OCR text \
+                                blocks, dominant colour candidates, etc.).
                                 """)
                         .version("1.0.0")
                         .contact(new Contact()
-                                .name("Brand Extractor")
-                                .email("platform@brandextractor.com")));
+                                .name("Brand Extractor Team")
+                                .email("platform@brandextractor.com"))
+                        .license(new License()
+                                .name("Private")))
+                .servers(List.of(
+                        new Server()
+                                .url("http://localhost:8080")
+                                .description("Local development")));
     }
 
     /**
