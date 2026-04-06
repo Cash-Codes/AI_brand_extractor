@@ -1,1 +1,1 @@
-An AI-powered brand asset extraction service that ingests websites and marketing collateral, then produces structured branding metadata through a hybrid extraction pipeline.
+A multimodal brand intelligence extraction platform built on Vertex AI, combining OCR, visual understanding, web parsing and schema-constrained LLM extraction.

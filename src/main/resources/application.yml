@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: brand-extractor-service
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+vertexai:
+  project-id: ${VERTEXAI_PROJECT_ID:placeholder}
+  location: us-central1
+  model-id: gemini-2.0-flash-001
