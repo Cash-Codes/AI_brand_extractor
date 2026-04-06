@@ -1,5 +1,6 @@
 package com.brandextractor.infrastructure.web.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -61,6 +62,9 @@ public class OpenApiConfig {
                                     .addProperty("message",       new Schema<>().type("string"))
                                     .addProperty("rejectedValue", new Schema<>().type("string"))));
 
+            if (openApi.getComponents() == null) {
+                openApi.setComponents(new Components());
+            }
             openApi.getComponents()
                     .addSchemas("ProblemDetail", problemDetailSchema);
 

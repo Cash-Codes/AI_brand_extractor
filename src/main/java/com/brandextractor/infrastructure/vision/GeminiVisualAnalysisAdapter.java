@@ -2,6 +2,7 @@ package com.brandextractor.infrastructure.vision;
 
 import com.brandextractor.domain.evidence.VisualEvidence;
 import com.brandextractor.domain.ports.VisualAnalysisPort;
+import com.brandextractor.support.error.FeatureNotAvailableException;
 import org.springframework.stereotype.Component;
 
 @Component

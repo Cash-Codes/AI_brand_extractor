@@ -3,6 +3,7 @@ package com.brandextractor.infrastructure.ai.vertex;
 import com.brandextractor.domain.evidence.Evidence;
 import com.brandextractor.domain.model.ExtractionResult;
 import com.brandextractor.domain.ports.AIAnalysisPort;
+import com.brandextractor.support.error.FeatureNotAvailableException;
 import com.google.cloud.vertexai.VertexAI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

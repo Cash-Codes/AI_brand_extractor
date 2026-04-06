@@ -111,10 +111,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleFileTooLarge(
             MaxUploadSizeExceededException ex, HttpServletRequest request) {
 
+        long maxBytes = ex.getMaxUploadSize();
+        String maxLabel = maxBytes > 0
+                ? (maxBytes / (1024 * 1024)) + " MB"
+                : "the configured limit";
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(
                 problem(HttpStatus.PAYLOAD_TOO_LARGE,
                         "File Too Large",
-                        "The uploaded file exceeds the maximum allowed size of 10 MB.",
+                        "The uploaded file exceeds the maximum allowed size of " + maxLabel + ".",
                         PROBLEM_BASE + "file-too-large",
                         request));
     }
@@ -158,9 +162,9 @@ public class GlobalExceptionHandler {
     // 501 — not yet implemented
     // -------------------------------------------------------------------------
 
-    @ExceptionHandler(UnsupportedOperationException.class)
+    @ExceptionHandler(FeatureNotAvailableException.class)
     public ResponseEntity<ProblemDetail> handleNotImplemented(
-            UnsupportedOperationException ex, HttpServletRequest request) {
+            FeatureNotAvailableException ex, HttpServletRequest request) {
 
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                 problem(HttpStatus.NOT_IMPLEMENTED,

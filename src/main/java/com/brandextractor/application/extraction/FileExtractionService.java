@@ -1,6 +1,7 @@
 package com.brandextractor.application.extraction;
 
 import com.brandextractor.domain.model.ExtractionResult;
+import com.brandextractor.support.error.FeatureNotAvailableException;
 import org.springframework.stereotype.Service;
 
 @Service

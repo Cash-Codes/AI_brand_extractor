@@ -2,6 +2,7 @@ package com.brandextractor.infrastructure.ingestion.flyer;
 
 import com.brandextractor.domain.evidence.FlyerEvidence;
 import com.brandextractor.domain.ports.FlyerIngestionPort;
+import com.brandextractor.support.error.FeatureNotAvailableException;
 import org.springframework.stereotype.Component;
 
 @Component
