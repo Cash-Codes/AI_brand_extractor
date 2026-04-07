@@ -10,6 +10,7 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.tags.Tag;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,23 +26,56 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Brand Extractor API")
                         .description("""
-                                Multimodal brand extraction service powered by Vertex AI Gemini.
+                                Multimodal brand intelligence platform powered by **Vertex AI Gemini**.
 
-                                Extracts a structured brand profile — colour palette, logo and hero assets, \
-                                social/contact links, tagline, summary, and per-field confidence scores — \
-                                from a public URL or an uploaded JPEG/PNG image file.
+                                Give it a public URL or upload a JPEG/PNG flyer and get back a fully \
+                                structured brand profile in a single API call: name, tagline, colour \
+                                palette, logo and hero assets, social/contact links, and per-field \
+                                confidence scores.
+
+                                ## How it works
+
+                                Unlike systems that send raw HTML straight to an LLM, this service uses \
+                                a **deterministic-first, AI-as-selector** approach:
+
+                                1. Rule-based services rank every signal (CSS design tokens, Open Graph \
+                                tags, DOM position, pixel frequency) before the AI sees anything.
+                                2. Gemini receives the pre-ranked candidates and selects the best one. \
+                                It never invents values — it picks from real evidence found in the source.
+                                3. Gemini's output is forced into an exact JSON schema via Vertex AI \
+                                controlled generation, eliminating hallucinated fields or malformed JSON.
 
                                 ## Optional evidence payload
-                                Append `?include=evidence` to any extraction endpoint to receive the full \
-                                raw evidence collected during extraction (website HTML signals, OCR text \
-                                blocks, dominant colour candidates, etc.).
+
+                                Append `?include=evidence` to any extraction endpoint to receive the \
+                                full raw evidence collected during extraction (HTML signals, OCR text \
+                                blocks, dominant colour candidates, visual labels, etc.) — useful for \
+                                debugging or building confidence in the results.
+
+                                ## Confidence scores
+
+                                Every extracted field carries a `confidence` score in `[0.0, 1.0]`. \
+                                Scores below `0.30` trigger a `LOW_CONFIDENCE` validation issue in the \
+                                response. Use these scores to decide how much downstream automation to \
+                                trust versus route to human review.
                                 """)
                         .version("1.0.0")
                         .contact(new Contact()
-                                .name("Brand Extractor Team")
-                                .email("platform@brandextractor.com"))
+                                .name("Brand Extractor")
+                                .url("https://github.com/Cash-Codes/AI_brand_extractor"))
                         .license(new License()
-                                .name("Private")))
+                                .name("Private — all rights reserved")))
+                .tags(List.of(
+                        new Tag()
+                                .name("Extractions")
+                                .description(
+                                        "Core extraction endpoints. Submit a URL or an image file and " +
+                                        "receive a structured brand profile with confidence scores."),
+                        new Tag()
+                                .name("Health")
+                                .description(
+                                        "Liveness probe. Returns `{\"status\": \"UP\"}` when the " +
+                                        "service is running.")))
                 .servers(List.of(
                         new Server()
                                 .url("http://localhost:8080")
@@ -72,12 +106,7 @@ public class OpenApiConfig {
                             .description("Time the error occurred (ISO-8601)"))
                     .addProperty("traceId",   new Schema<>().type("string")
                             .description("Identifier for correlating this error with server logs"))
-                    .addProperty("errors",    new Schema<>().type("array")
-                            .description("Field-level violations (validation errors only)")
-                            .items(new Schema<>()
-                                    .addProperty("field",         new Schema<>().type("string"))
-                                    .addProperty("message",       new Schema<>().type("string"))
-                                    .addProperty("rejectedValue", new Schema<>().type("string"))));
+                    .addProperty("errors",    fieldViolationsArraySchema());
 
             if (openApi.getComponents() == null) {
                 openApi.setComponents(new Components());
@@ -95,5 +124,25 @@ public class OpenApiConfig {
             openApi.getComponents()
                     .addResponses("Problem", problemResponse);
         };
+    }
+
+    /**
+     * Builds the field-violations array schema without triggering raw-type warnings.
+     * {@link Schema#addProperty} returns the raw {@code Schema} type in the OAS model
+     * library, so chaining {@code .items()} directly on it produces an unavoidable
+     * compiler warning. Building the item schema in a typed local variable sidesteps this.
+     */
+    private Schema<Object> fieldViolationsArraySchema() {
+        Schema<Object> itemSchema = new Schema<Object>()
+                .type("object")
+                .addProperty("field",         new Schema<String>().type("string"))
+                .addProperty("message",       new Schema<String>().type("string"))
+                .addProperty("rejectedValue", new Schema<String>().type("string"));
+
+        Schema<Object> arraySchema = new Schema<>();
+        arraySchema.type("array");
+        arraySchema.description("Field-level violations (validation errors only)");
+        arraySchema.setItems(itemSchema);
+        return arraySchema;
     }
 }
