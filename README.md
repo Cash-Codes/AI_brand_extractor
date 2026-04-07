@@ -5,7 +5,10 @@
 [![CI](https://github.com/Cash-Codes/AI_brand_extractor/actions/workflows/ci.yml/badge.svg)](https://github.com/Cash-Codes/AI_brand_extractor/actions/workflows/ci.yml)
 ![Java 21](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot 3.4](https://img.shields.io/badge/SpringBoot-6DB33F?style=flat-square&logo=Spring&logoColor=white)
-![Vertex AI](https://img.shields.io/badge/Vertex_AI-4285F4?style=flat&logo=googlecloud&logoColor=white)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-6BA539?logo=openapiinitiative&logoColor=white)](#)
+[![Swagger](https://img.shields.io/badge/Swagger-85EA2D?logo=swagger&logoColor=173647)](#)
+[![Google Gemini](https://img.shields.io/badge/Google%20Gemini-886FBF?logo=googlegemini&logoColor=white)](#)
+![Vertex AI](https://img.shields.io/badge/Vertex_AI-GCP-4285F4?logo=googlecloud&logoColor=white)
 
 ---
 
