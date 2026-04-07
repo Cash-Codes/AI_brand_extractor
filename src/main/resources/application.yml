@@ -38,8 +38,18 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    try-it-out-enabled: true
+    default-models-expand-depth: 2
+    default-model-expand-depth: 2
+    doc-expansion: list
+    filter: true                   # enables the search bar
+    persist-authorization: true
   api-docs:
     path: /v3/api-docs
+  show-actuator: false             # keep actuator endpoints out of the API docs
 
 # ---------------------------------------------------------------------------
 # Vertex AI / Gemini

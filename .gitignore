@@ -12,5 +12,3 @@ out/
 bin/
 .env
 *.env
-.claude/
-docs/

@@ -232,7 +232,9 @@ public class ExtractionController {
             @Parameter(
                     description = "JPEG or PNG image to extract brand data from. Maximum size 10 MB.",
                     required = true,
-                    content = @Content(mediaType = MediaType.IMAGE_PNG_VALUE))
+                    content = @Content(
+                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            schema = @Schema(type = "string", format = "binary")))
             @RequestPart("file") MultipartFile file,
             @Parameter(description = "Human-readable label for this source, e.g. the original filename. Optional.")
             @RequestPart(value = "sourceLabel", required = false) String sourceLabel,
